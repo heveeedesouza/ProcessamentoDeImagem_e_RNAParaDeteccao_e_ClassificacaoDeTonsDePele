@@ -1,1 +1,56 @@
+import cv2
+import os
+
+classes = ['claro', 'medio', 'escuro']
+base_dir = 'data'
+
+for c in classes:
+    os.makedirs(os.path.join(base_dir, c), exist_ok=True)
+
+print("Pressione:")
+print("  1 - para CLARO")
+print("  2 - para MÉDIO")
+print("  3 - para ESCURO")
+print("  q - para sair")
+
+cap = cv2.VideoCapture(0)
+contadores = {c: len(os.listdir(os.path.join(base_dir, c))) for c in classes}
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+    frame = cv2.flip(frame, 1)
+
+    cv2.rectangle(frame, (100, 100), (300, 300), (0,255,0), 2)
+    cv2.putText(frame, "Posicione a pele dentro da caixa", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+    cv2.imshow("Coleta de Tons de Pele", frame)
+
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord('1'):
+        roi = frame[100:300, 100:300]
+        filename = f"{base_dir}/claro/img_{contadores['claro']}.jpg"
+        cv2.imwrite(filename, roi)
+        contadores['claro'] += 1
+        print(f"Imagem salva: {filename}")
+    elif key == ord('2'):
+        roi = frame[100:300, 100:300]
+        filename = f"{base_dir}/medio/img_{contadores['medio']}.jpg"
+        cv2.imwrite(filename, roi)
+        contadores['medio'] += 1
+        print(f"Imagem salva: {filename}")
+    elif key == ord('3'):
+        roi = frame[100:300, 100:300]
+        filename = f"{base_dir}/escuro/img_{contadores['escuro']}.jpg"
+        cv2.imwrite(filename, roi)
+        contadores['escuro'] += 1
+        print(f"Imagem salva: {filename}")
+    elif key == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+print("Coleta finalizada!")
+
 
